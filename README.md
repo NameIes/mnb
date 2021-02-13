@@ -1,0 +1,2 @@
+# mnb
+Simple notebook project
