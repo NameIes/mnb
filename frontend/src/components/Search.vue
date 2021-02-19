@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div class="mx-2">
     <input
       type="text"
       class="form-control"
@@ -10,7 +10,6 @@
       @keydown="controlFocus"
       v-model="searchValue"
     />
-    <div>{{ filterTags }}</div>
     <transition name="fade">
       <div class="dropdown-list" v-show="isListVisible" id="dropdown-list">
         <div class="dropdown-list-item" :class="{ 'focus': 0 === focus }" @mouseover="setFocus(0)" @click="createNewTag()">Create tag</div>
@@ -21,12 +20,25 @@
           :class="{ 'focus': index+2 === focus }"
           class="dropdown-list-item text-truncate"
           @mouseover="setFocus(index+2)"
-          @click="addTagToFilters(item.id)"
+          @click="addTagToFilters(item)"
         >
           {{ item.name }}
         </div>
       </div>
     </transition>
+    <div class="mt-2" id="pinned-tags">
+      <span
+        class="badge rounded-pill bg-primary pinned-tag"
+        v-for="tag in filterTags"
+        :key="tag.id"
+      >
+        <p class="text-truncate float-start pinned-tag-text">
+          {{ tag.name }}
+        </p>
+        <button class="text-white btn btn-sm p-0 ms-1 lh-1 fw-bold" @click="deleteFilterTag(tag.id)">X</button>
+      </span>
+      <div class="fade-effect"></div>
+    </div>
   </div>
 </template>
 
@@ -87,6 +99,10 @@ export default {
           if (this.focus > 0) this.focus--;
           if (this.focus > 5) elem.scrollTop -= 36;
           break;
+        case 27:
+          if (document.activeElement instanceof HTMLElement)
+            document.activeElement.blur();
+          break;
         case 40:
           if (this.focus < this.findedTags().length + 1) this.focus++;
           if (this.focus > 7) elem.scrollTop += 36;
@@ -100,8 +116,9 @@ export default {
             this.createNewNote();
             break;
           }
+          if (this.findedTags().length <= this.focus-2) break;
           this.addTagToFilters(
-            this.findedTags()[this.focus-2].id
+            this.findedTags()[this.focus-2]
           );
           break;
       }
@@ -121,21 +138,25 @@ export default {
       console.log('NOTE CREATE');
       // TODO: AXIOS
     },
-    addTagToFilters: function(id) {
+    addTagToFilters: function(item) {
       console.log('TAG ADDED');
+
       this.isListVisible = false;
       this.searchValue = '';
-      this.filterTags.push(id);
+      this.filterTags.push(item);
     },
     findedTags: function() {
       let filteredByQuery = this.tagsList.filter((item) => {
         return !item.name.search(this.searchValue);
       });
-      return filteredByQuery.filter(item => !this.filterTags.includes(item.id));
+      return filteredByQuery.filter(item => !this.filterTags.includes(item));
     },
     findedNotes: function() {
       // TODO: AXIOS
     },
+    deleteFilterTag: function(id) {
+      this.filterTags = this.filterTags.filter((item) => item.id != id);
+    }
   },
 };
 </script>
@@ -166,7 +187,25 @@ export default {
 .fade-enter-active, .fade-leave-active {
   transition: opacity .1s;
 }
+
 .fade-enter, .fade-leave-to {
   opacity: 0;
+}
+
+.pinned-tag {
+  margin: 0px 2px;
+  max-width: 310px;
+}
+
+.pinned-tag-text {
+  max-width: 280px;
+  margin: 0;
+  margin-top: 3px;
+  padding-right: 5px;
+}
+
+#pinned-tags {
+  position: relative;
+  width: 320px;
 }
 </style>
