@@ -1,12 +1,12 @@
 <template>
   <div id="app" class="d-flex">
-    <div id="items-list" class="vh-100 pt-3 px-0" :class="{ 'opened': leftPanel }" @mouseover="openLeftPanel" @mouseleave="closeLeftPanel">
+    <div id="items-list" class="vh-100 pt-3 px-0" :class="{ 'opened': leftPanel }" @mousemove="openLeftPanel" @mouseleave="closeLeftPanel">
       <Search @search-focused="changeSearchStatus($event)" ref="mySearch"></Search>
       <hr class="mb-1 mt-2 mx-2">
       <NotesList></NotesList>
     </div>
     <div id="data-view" class="vh-100 w-100">
-      Somebody once told me
+      <Note></Note>
     </div>
   </div>
 </template>
@@ -14,12 +14,14 @@
 <script>
 import NotesList from './components/NotesList.vue'
 import Search from './components/Search.vue'
+import Note from './components/Note.vue'
 
 export default {
   name: 'App',
   components: {
     NotesList,
-    Search
+    Search,
+    Note
   },
   data: function () {
     return {
@@ -29,9 +31,11 @@ export default {
     }
   },
   methods: {
-    openLeftPanel: function() {
-      this.leftPanel = true;
-      this.leftPanelMouseOver = true;
+    openLeftPanel: function(e) {
+      if (e.pageX <= 50) {
+        this.leftPanel = true;
+        this.leftPanelMouseOver = true;
+      }
     },
     closeLeftPanel: function() {
       if (!this.searchFocused) {
@@ -44,12 +48,16 @@ export default {
       if (!this.leftPanelMouseOver) {
         this.leftPanel = false;
       }
-    }
+    },
   }
 }
 </script>
 
 <style>
+body {
+  overflow: hidden;
+}
+
 #items-list.opened {
   width: 340px;
 }
@@ -79,8 +87,17 @@ export default {
   left: 0;
   right: 0;
   top: 0;
-  bottom: 0;
+  bottom: 0px;
   background: white;
+}
+
+#items-list.opened .notes-main {
+  margin-left: 0px;
+}
+
+#items-list .notes-main {
+  transition-duration: .2s;
+  margin-left: -300px;
 }
 
 #items-list.opened + #data-view {

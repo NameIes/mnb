@@ -7,7 +7,7 @@
         </div>
         <div class="w-100 ms-2">
           <h5 class="my-0">{{ note.name }}</h5>
-          <small class="text-muted" v-show="!note.isNote"><i class="far fa-clock me-1"></i> {{ note.date }}</small>
+          <small class="text-muted" v-show="!note.isNote"><i class="far fa-clock me-1"></i> Due {{ humanizeDate(note) }}</small>
           <hr class="my-1">
           <div class="note-tags">
             <span
@@ -21,11 +21,12 @@
         </div>
       </li>
     </ul>
-    <div class="fade-effect"></div>
   </div>
 </template>
 
 <script>
+import moment from 'moment'
+
 export default {
   name: "NotesList",
   data: function () {
@@ -54,8 +55,8 @@ export default {
         },
         {
           id: 2,
-          name: "Complete notes search",
-          date: "2021-02-24T10:00:00",
+          name: "Complete notes editor",
+          date: "2021-02-24T17:00:00",
           completed: false,
           isNote: false,
           tags: [
@@ -96,10 +97,12 @@ export default {
       }
       note;
       console.log(this);
+      // TODO: AXIOS
     },
     changeNoteStatus: function(note) {
       note;
       console.log('Note status');
+      // TODO: AXIOS
     },
     filteredNotes: function() {
       if (!this.tags && !this.query) {
@@ -122,6 +125,9 @@ export default {
       return filteredByTags.filter(item => {
         return !item.name.search(new RegExp(this.query, "i"));
       });
+    },
+    humanizeDate: function (note) {
+      return moment(note.date).fromNow();
     }
   },
   watch: {
@@ -140,6 +146,7 @@ export default {
   position: relative;
   width: 339px;
   height: 100%;
+  max-height: calc(100% - 53px);
   overflow-y: auto;
 }
 
