@@ -1,7 +1,7 @@
 <template>
   <div id="app" class="d-flex">
     <div id="items-list" class="vh-100 pt-3 px-0" :class="{ 'opened': leftPanel }" @mouseover="openLeftPanel" @mouseleave="closeLeftPanel">
-      <Search @search-focused="changeSearchStatus($event)"></Search>
+      <Search @search-focused="changeSearchStatus($event)" ref="mySearch"></Search>
       <hr class="mb-1 mt-2 mx-2">
       <NotesList></NotesList>
     </div>

@@ -48,9 +48,9 @@ export default {
   data: function() {
     return {
       tagsList: [
-        { name: "test", id: 1 },
-        { name: "qwe", id: 2 },
-        { name: "ewq", id: 3 },
+        { name: "Vue", id: 1 },
+        { name: "Django", id: 2 },
+        { name: "Python", id: 3 },
         { name: "adhgsasfasgfasdgsdfhdfjfgjfghkghklgltudfghsrgaedgsdfhsfdjhdf", id: 4 },
         { name: "gfhklgh", id: 5 },
         { name: "syhwr", id: 6 },
@@ -147,12 +147,9 @@ export default {
     },
     findedTags: function() {
       let filteredByQuery = this.tagsList.filter((item) => {
-        return !item.name.search(this.searchValue);
+        return !item.name.search(new RegExp(this.searchValue, "i"));
       });
       return filteredByQuery.filter(item => !this.filterTags.includes(item));
-    },
-    findedNotes: function() {
-      // TODO: AXIOS
     },
     deleteFilterTag: function(id) {
       this.filterTags = this.filterTags.filter((item) => item.id != id);
