@@ -1,10 +1,12 @@
 from flask import Flask, request, jsonify, abort
 from flask_sqlalchemy import SQLAlchemy
+from flask_cors import CORS
 import datetime
 
 app = Flask(__name__)
 app.config.from_object('config')
 db = SQLAlchemy(app)
+CORS(app)
 
 tags_r = db.Table(
     'tags_relationship',
@@ -100,6 +102,7 @@ def get_note(note_id):
     note = {
         'id': note.note_id,
         'name': note.name,
+        'description': note.description,
         'date': note.due_date,
         'is_note': note.is_note,
         'completed': note.is_complete,
@@ -190,6 +193,7 @@ def remove_tag_from_note():
         db.session.commit()
         return jsonify({'success': True})
     abort(404)
+
 
 if __name__ == '__main__':
     app.run(debug=True)
