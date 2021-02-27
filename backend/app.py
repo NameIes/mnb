@@ -88,7 +88,7 @@ def get_all_notes():
     notes = [{
         'id': note.note_id,
         'name': note.name,
-        'date': note.due_date,
+        'date': note.due_date.strftime('%Y-%m-%dT%H:%M:%S.%fZ') if note.due_date else None,
         'is_note': note.is_note,
         'completed': note.is_complete,
         'tags': [{'id': tag.tag_id, 'name': tag.name} for tag in note.tags]
@@ -119,7 +119,7 @@ def create_note():
             name=req['name'],
         )
         if req.get('date'):
-            dt = datetime.datetime.strptime(req['date'], '%Y-%m-%dT%H:%M:%S')
+            dt = datetime.datetime.strptime(req['date'], '%Y-%m-%dT%H:%M:%S.%f')
             note.due_date = dt
         if req.get('is_note'):
             note.is_note = True if req['is_note'] == 'true' else False
@@ -151,7 +151,7 @@ def edit_note(note_id):
         if req.get('description'):
             note.description = req['description']
         if req.get('date'):
-            dt = datetime.datetime.strptime(req['date'], '%Y-%m-%dT%H:%M:%S')
+            dt = datetime.datetime.strptime(req['date'], '%Y-%m-%dT%H:%M:%S.%f')
             note.due_date = dt
         if req.get('is_note'):
             note.is_note = True if req['is_note'] == 'true' else False
