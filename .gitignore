@@ -303,3 +303,4 @@ dist
 
 # End of https://www.toptal.com/developers/gitignore/api/vscode,linux,python,vuejs,git
 vetur.config.js
+mnb.db

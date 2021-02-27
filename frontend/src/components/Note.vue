@@ -5,11 +5,14 @@
     </div>
 
     <div v-else-if="isEditing" class="mx-3 mt-3 h-100">
-      <button class="btn btn-success py-0 float-end" @click="saveDataChanges()">Save</button>
+      <input type="text" class="float-start" v-model="openedNote.name">
+      <button class="btn btn-success py-0 px-4 mt-3 float-end" @click="saveDataChanges()">Save</button>
       <textarea class="w-100 mt-2" v-model="noteData"></textarea>
     </div>
 
-    <div v-else v-html="getNoteData()" class="ms-3 mt-3" @dblclick="changeData()">
+    <div v-else class="ms-3 mt-3">
+      <h1 @dblclick="changeData()">{{ openedNote.name }}</h1>
+      <div v-html="getNoteData()" @dblclick="changeData()"></div>
     </div>
   </div>
 </template>
@@ -31,11 +34,12 @@ export default {
       return markdown.toHTML(this.noteData, 'Maruku');
     },
     openNote: function(note) {
-      note;
+      this.openedNote = note;
+      this.noteData = 'Some text';
+      this.isEditing = false;
       // TODO: AXIOS
     },
     saveDataChanges: function() {
-      console.log('test');
       this.isEditing = false;
     },
     changeData: function() {

@@ -43,28 +43,21 @@
 </template>
 
 <script>
+const axios = require('axios').default;
+
 export default {
   name: "Search",
+  created: function() {
+    axios({
+      method: 'GET',
+      url: 'http://127.0.0.1:5000/get/tags/',
+    }).then(response => {
+      this.tagsList = response.data;
+    });
+  },
   data: function() {
     return {
-      tagsList: [
-        { name: "Vue", id: 1 },
-        { name: "Django", id: 2 },
-        { name: "Python", id: 3 },
-        { name: "adhgsasfasgfasdgsdfhdfjfgjfghkghklgltudfghsrgaedgsdfhsfdjhdf", id: 4 },
-        { name: "gfhklgh", id: 5 },
-        { name: "syhwr", id: 6 },
-        { name: "jfkqf", id: 7 },
-        { name: "jfwkf", id: 8 },
-        { name: "jfkef", id: 9 },
-        { name: "jfkrf", id: 10 },
-        { name: "jfktf", id: 11 },
-        { name: "jfkyf", id: 12 },
-        { name: "jfkuf", id: 13 },
-        { name: "jfkif", id: 14 },
-        { name: "jfkof", id: 15 },
-        { name: "jfkpf", id: 16 },
-      ],
+      tagsList: [],
       isListVisible: false,
       searchValue: '',
       focus: 0,
@@ -90,7 +83,6 @@ export default {
       } else {
         this.isListVisible = false;
       }
-      // TODO: Filter notes
     },
     controlFocus: function(event) {
       let elem = document.getElementById('dropdown-list');
@@ -127,27 +119,56 @@ export default {
       this.focus = index;
     },
     createNewTag: function() {
+      if (this.searchValue.trim().length < 3)
+        return;
+
+      let fd = new FormData();
+      fd.append('name', this.searchValue);
+
+      axios({
+        method: 'POST',
+        url: 'http://127.0.0.1:5000/create/tag/',
+        data: fd,
+        headers: {
+          'Content-Type': 'multipart/form-data'
+        }
+      }).then(response => {
+        this.tagsList.push(response.data);
+      });
+
       this.isListVisible = false;
       this.searchValue = '';
-      console.log('TAG CREATE');
-      // TODO: AXIOS
     },
     createNewNote: function() {
+      if (this.searchValue.trim().length < 3)
+        return;
+
+      let fd = new FormData();
+      fd.append('name', this.searchValue);
+      fd.append('is_note', true);
+
+      axios({
+        method: 'POST',
+        url: 'http://127.0.0.1:5000/create/note/',
+        data: fd,
+        headers: {
+          'Content-Type': 'multipart/form-data'
+        }
+      }).then(response => {
+        this.$parent.$refs.myNotes.notes.push(response.data);
+      });
+
       this.isListVisible = false;
       this.searchValue = '';
-      console.log('NOTE CREATE');
-      // TODO: AXIOS
     },
     addTagToFilters: function(item) {
-      console.log('TAG ADDED');
-
       this.isListVisible = false;
       this.searchValue = '';
       this.filterTags.push(item);
     },
     findedTags: function() {
       let filteredByQuery = this.tagsList.filter((item) => {
-        return !item.name.search(new RegExp(this.searchValue, "i"));
+        return item.name.search(new RegExp(this.searchValue, "i")) >= 0;
       });
       return filteredByQuery.filter(item => !this.filterTags.includes(item));
     },

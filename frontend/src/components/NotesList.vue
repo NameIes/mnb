@@ -3,11 +3,11 @@
     <ul class="list-group list-group-flush pt-0">
       <li class="list-group-item d-flex note-item" v-for="note in filteredNotes()" :key="note.id" @click="openNote($event, note)">
         <div class="flex-shrink vertical-separator d-flex align-items-center">
-          <button class="btn rounded-circle complete-btn p-0" :class="noteStatus(note)" :disabled="note.isNote" @click="changeNoteStatus(note)" name="statusBtn"></button>
+          <button class="btn rounded-circle complete-btn p-0" :class="noteStatus(note)" :disabled="note.is_note" @click="changeNoteStatus(note)" name="statusBtn"></button>
         </div>
         <div class="w-100 ms-2">
           <h5 class="my-0">{{ note.name }}</h5>
-          <small class="text-muted" v-show="!note.isNote"><i class="far fa-clock me-1"></i> Due {{ humanizeDate(note) }}</small>
+          <small class="text-muted" v-show="!note.is_note && note.date"><i class="far fa-clock me-1"></i> Due {{ humanizeDate(note) }}</small>
           <hr class="my-1">
           <div class="note-tags">
             <span
@@ -26,65 +26,37 @@
 
 <script>
 import moment from 'moment'
+const axios = require('axios').default;
 
 export default {
   name: "NotesList",
+  created: function() {
+    axios({
+      method: 'GET',
+      url: 'http://127.0.0.1:5000/get/notes/',
+    }).then(response => {
+      this.notes = response.data;
+    });
+  },
   data: function () {
     return {
-      notes: [
-        {
-          id: 1,
-          name: "Axios CSRF",
-          date: "2021-02-24T10:00:00",
-          completed: false,
-          isNote: true,
-          tags: [
-            {
-              id: 1,
-              name: 'Vue'
-            },
-            {
-              id: 2,
-              name: 'Django'
-            },
-            {
-              id: 3,
-              name: 'Python'
-            },
-          ]
-        },
-        {
-          id: 2,
-          name: "Complete notes editor",
-          date: "2021-02-24T17:00:00",
-          completed: false,
-          isNote: false,
-          tags: [
-            {
-              id: 1,
-              name: 'Vue'
-            },
-            {
-              id: 3,
-              name: 'Python'
-            },
-          ]
-        },
-      ],
+      notes: [],
       query: '',
       tags: [],
     }
   },
   methods: {
     noteStatus: function(note) {
-      if (note.isNote) {
+      if (note.is_note) {
         return "btn-secondary";
       }
       if (note.completed) {
         return "btn-success";
       }
-      if (new Date(note.date) < Date.now()) {
-        return "btn-danger";
+      if (note.date) {
+        if (new Date(note.date) < Date.now()) {
+          return "btn-danger";
+        }
       }
       return "btn-outline-primary";
     },
@@ -93,16 +65,23 @@ export default {
         event.preventDefault();
         event.stopPropagation();
       } else {
-        console.log('Note open');
+        this.$parent.$refs.myNote.openNote(note);
       }
-      note;
-      console.log(this);
-      // TODO: AXIOS
     },
     changeNoteStatus: function(note) {
-      note;
-      console.log('Note status');
-      // TODO: AXIOS
+      let fd = new FormData();
+      fd.append('completed', !note.completed);
+
+      axios({
+        method: 'POST',
+        url: 'http://127.0.0.1:5000/edit/note/' + note.id + '/',
+        data: fd,
+        headers: {
+          'Content-Type': 'multipart/form-data'
+        }
+      }).then(() => {
+        note.completed = !note.completed;
+      });
     },
     filteredNotes: function() {
       if (!this.tags && !this.query) {
@@ -123,7 +102,7 @@ export default {
       }
 
       return filteredByTags.filter(item => {
-        return !item.name.search(new RegExp(this.query, "i"));
+        return item.name.search(new RegExp(this.query, "i")) >= 0;
       });
     },
     humanizeDate: function (note) {

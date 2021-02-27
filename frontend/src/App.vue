@@ -3,10 +3,10 @@
     <div id="items-list" class="vh-100 pt-3 px-0" :class="{ 'opened': leftPanel }" @mousemove="openLeftPanel" @mouseleave="closeLeftPanel">
       <Search @search-focused="changeSearchStatus($event)" ref="mySearch"></Search>
       <hr class="mb-1 mt-2 mx-2">
-      <NotesList></NotesList>
+      <NotesList ref="myNotes"></NotesList>
     </div>
     <div id="data-view" class="vh-100 w-100">
-      <Note></Note>
+      <Note ref="myNote"></Note>
     </div>
   </div>
 </template>
