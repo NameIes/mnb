@@ -122,7 +122,7 @@ export default {
       this.focus = index;
     },
     createNewTag: function() {
-      if (this.searchValue.trim().length < 3)
+      if (this.searchValue.trim().length < 2)
         return;
 
       let fd = new FormData();
@@ -143,7 +143,7 @@ export default {
       this.searchValue = '';
     },
     createNewNote: function() {
-      if (this.searchValue.trim().length < 3)
+      if (this.searchValue.trim().length < 2)
         return;
 
       let fd = new FormData();

@@ -6,6 +6,8 @@ const path = require('path');
 let mainWindow;
 
 function createWindow() {
+    let subpy = require('child_process').spawn('./app');
+
     mainWindow = new BrowserWindow({
         width: 800,
         height: 600,
