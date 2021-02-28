@@ -3,9 +3,14 @@ from flask_sqlalchemy import SQLAlchemy
 from flask_cors import CORS
 import datetime
 import asyncio
+import os
 
+basedir = os.path.abspath(os.path.dirname(__file__))
 app = Flask(__name__)
-app.config.from_object('config')
+
+app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///' + os.path.join(basedir, 'mnb.db')
+app.config['SQLALCHEMY_MIGRATE_REPO'] = os.path.join(basedir, 'db_repository')
+
 db = SQLAlchemy(app)
 CORS(app)
 
