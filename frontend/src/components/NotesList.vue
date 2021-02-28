@@ -8,7 +8,7 @@
         <div class="w-100 ms-2">
           <h5 class="my-0">{{ note.name }}</h5>
           <small class="text-muted" v-show="!note.is_note && note.date"><i class="far fa-clock me-1"></i> Due {{ humanizeDate(note) }}</small>
-          <hr class="my-1">
+          <hr v-show="note.tags.length" class="my-1">
           <div class="note-tags">
             <span
               class="badge rounded-pill bg-primary note-tag me-1"
@@ -46,6 +46,9 @@ export default {
     }
   },
   methods: {
+    removeNote: function (note) {
+      this.notes = this.notes.filter(item => item.id !== note.id);
+    },
     noteStatus: function(note) {
       if (note.is_note) {
         return "btn-secondary";

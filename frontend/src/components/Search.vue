@@ -48,12 +48,7 @@ const axios = require('axios').default;
 export default {
   name: "Search",
   created: function() {
-    axios({
-      method: 'GET',
-      url: 'http://127.0.0.1:5000/get/tags/',
-    }).then(response => {
-      this.tagsList = response.data;
-    });
+    this.updateTags();
   },
   data: function() {
     return {
@@ -65,6 +60,14 @@ export default {
     };
   },
   methods: {
+    updateTags: function () {
+      axios({
+        method: 'GET',
+        url: 'http://127.0.0.1:5000/get/tags/',
+      }).then(response => {
+        this.tagsList = response.data;
+      });
+    },
     srchFocused: function() {
       this.$emit("search-focused", true);
       if (this.searchValue.length > 1) {

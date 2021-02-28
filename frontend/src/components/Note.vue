@@ -66,6 +66,7 @@
             </span>
           </div>
         </div>
+        <button class="btn btn-danger w-100 py-0 my-3" @click="deleteNote">Delete note</button>
       </div>
     </div>
 
@@ -105,10 +106,23 @@ export default {
     };
   },
   methods: {
+    deleteNote: function () {
+      if (!confirm('Are you sure you want to delete?'))
+        return;
+
+      axios({
+        method: 'DELETE',
+        url: 'http://127.0.0.1:5000/delete/note/' + this.openedNote.id + '/',
+      }).then(() => {
+        this.$parent.$refs.myNotes.removeNote(this.openedNote);
+        this.openedNote = false;
+      });
+    },
     removeTagFromNote: function(tag) {
       this.openedNote.tags = this.openedNote.tags.filter(item => item.id != tag.id);
     },
     addTagToNote: function(tag) {
+      this.showSearch = false;
       this.searchQuery = '';
       this.openedNote.tags.push(tag);
     },
@@ -133,6 +147,7 @@ export default {
       });
 
       this.searchQuery = '';
+      this.showSearch = false;
     },
     controlFocus: function(event) {
       let elem = document.getElementById('note-tags-search');
@@ -236,6 +251,12 @@ export default {
       fd.append('date', this.openedNote.date.slice(0, -1));
       fd.append('description', this.noteData);
 
+      let tags = '';
+      for (let i=0; i<this.openedNote.tags.length; i++)
+        tags += this.openedNote.tags[i].id + ' ';
+
+      fd.append('tags', tags);
+
       axios({
         method: 'POST',
         url: 'http://127.0.0.1:5000/edit/note/' + this.openedNote.id + '/',
@@ -245,6 +266,7 @@ export default {
         }
       }).then(() => {
         this.isEditing = false;
+        this.$parent.$refs.mySearch.tagsList.updateTags();
       });
     },
     cancelDataChanges: function () {
@@ -281,7 +303,7 @@ textarea {
 
 #note-main {
   height: 100%;
-  max-height: 100%;
+  max-height: 100vh;
   overflow-y: auto;
 }
 
