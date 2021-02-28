@@ -2,6 +2,7 @@ from flask import Flask, request, jsonify, abort
 from flask_sqlalchemy import SQLAlchemy
 from flask_cors import CORS
 import datetime
+import asyncio
 
 app = Flask(__name__)
 app.config.from_object('config')
@@ -141,6 +142,14 @@ def create_note():
     abort(404)
 
 
+def delete_not_used_tags():
+    tags = Tag.query.all()
+    for tag in tags:
+        if tag.notes.count() == 0:
+            db.session.delete(tag)
+    db.session.commit()
+
+
 @app.route('/edit/note/<int:note_id>/', methods=['POST'])
 def edit_note(note_id):
     if request.method == 'POST':
@@ -157,7 +166,15 @@ def edit_note(note_id):
             note.is_note = True if req['is_note'] == 'true' else False
         if req.get('completed'):
             note.is_complete = True if req['completed'] == 'true' else False
+        if req.get('tags'):
+            tags = [int(i) for i in req['tags'].split()]
+            note.tags = [tag for tag in note.tags if tag.tag_id in tags]
+            tags = [Tag.query.get(tag) for tag in tags]
+            for tag in tags:
+                if tag not in note.tags:
+                    note.tags.append(tag)
         db.session.commit()
+        delete_not_used_tags()
         return jsonify({'success': True})
     abort(404)
 
@@ -167,29 +184,6 @@ def delete_note(note_id):
     if request.method == 'DELETE':
         note = Note.query.get(note_id)
         db.session.delete(note)
-        db.session.commit()
-        return jsonify({'success': True})
-    abort(404)
-
-
-@app.route('/addtag/', methods=['POST'])
-def add_tag_to_note():
-    if request.method == 'POST':
-        req = request.form
-        note = Note.query.get(req['note_id'])
-        tag = Tag.query.get(req['tag_id'])
-        note.tags.append(tag)
-        db.session.commit()
-        return jsonify({'success': True})
-    abort(404)
-
-
-@app.route('/removetag/', methods=['POST'])
-def remove_tag_from_note():
-    if request.method == 'POST':
-        req = request.form
-        note = Note.query.get(req['note_id'])
-        note.tags = [tag for tag in note.tags if tag.tag_id != int(req['tag_id'])]
         db.session.commit()
         return jsonify({'success': True})
     abort(404)
