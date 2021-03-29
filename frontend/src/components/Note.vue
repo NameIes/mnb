@@ -86,7 +86,7 @@
 
 <script>
 import { Datetime } from 'vue-datetime';
-var markdown = require('markdown').markdown;
+var markdown = require('marked');
 const axios = require('axios').default;
 
 export default {
@@ -213,7 +213,7 @@ export default {
       }
     },
     getNoteData: function() {
-      return markdown.toHTML(this.noteData, 'Maruku');
+      return markdown(this.noteData);
     },
     openNote: function(note) {
       if (this.isEditing && this.openedNote) {

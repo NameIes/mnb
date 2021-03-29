@@ -2,12 +2,13 @@ const {app, BrowserWindow} = require('electron');
 
 const url = require('url');
 const path = require('path');
+const axios = require('axios').default;
 
 let mainWindow;
 
-function createWindow() {
-    let subpy = require('child_process').spawn('./app');
+let subpy = require('child_process').spawn('./app');
 
+function createWindow() {
     mainWindow = new BrowserWindow({
         width: 800,
         height: 600,
@@ -34,6 +35,10 @@ function createWindow() {
 app.on('ready', createWindow);
 
 app.on('window-all-closed', function () {
+    axios({
+        method: 'GET',
+        url: 'http://127.0.0.1:5000/stop/',
+    });
     app.quit();
 });
 
