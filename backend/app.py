@@ -3,7 +3,7 @@ from flask_sqlalchemy import SQLAlchemy
 from flask_cors import CORS
 import datetime
 import asyncio
-import os
+import os, signal
 
 basedir = os.path.abspath(os.path.dirname(__file__))
 app = Flask(__name__)
@@ -194,5 +194,15 @@ def delete_note(note_id):
     abort(404)
 
 
+def shutdown_server():
+    func = request.environ.get('werkzeug.server.shutdown')
+
+
+@app.route('/stop/', methods=['GET'])
+def stop():
+    os.kill(os.getpid(), signal.SIGINT)
+    return jsonify({'success': True})
+
+
 if __name__ == '__main__':
-    app.run(debug=True)
+    app.run(debug=False)
