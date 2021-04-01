@@ -194,10 +194,6 @@ def delete_note(note_id):
     abort(404)
 
 
-def shutdown_server():
-    func = request.environ.get('werkzeug.server.shutdown')
-
-
 @app.route('/stop/', methods=['GET'])
 def stop():
     os.kill(os.getpid(), signal.SIGINT)
